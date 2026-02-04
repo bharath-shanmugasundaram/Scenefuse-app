@@ -11,6 +11,8 @@ interface TimelineProps {
   className?: string;
 }
 
+const waveformHeights = Array.from({ length: 100 }, () => 20 + Math.random() * 60);
+
 export function Timeline({ className }: TimelineProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -180,12 +182,12 @@ export function Timeline({ className }: TimelineProps) {
         </div>
 
         <div className="absolute top-6 left-0 right-0 h-12 flex items-center px-1">
-          {Array.from({ length: 100 }).map((_, i) => (
+          {waveformHeights.map((h, i) => (
             <div
               key={i}
               className="flex-1 mx-px bg-gray-300 rounded-sm"
               style={{
-                height: `${20 + Math.random() * 60}%`,
+                height: `${h}%`,
               }}
             />
           ))}
