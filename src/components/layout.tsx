@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
+  Download,
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -16,7 +17,20 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { ui, setSidebarOpen, setShowComparison, video } = useEditorStore();
+  const { ui, setSidebarOpen, setShowComparison, video, processedVideoUrl } = useEditorStore();
+
+  const handleDownload = () => {
+    const url = processedVideoUrl || video?.url;
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = processedVideoUrl
+      ? `processed-${video?.name || 'video.mp4'}`
+      : video?.name || 'video.mp4';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <div className="min-h-screen bg-white flex">
@@ -87,13 +101,22 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex items-center gap-4">
             <ModeToggle />
             {video && (
-              <button
-                onClick={() => setShowComparison(true)}
-                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                <Layers className="w-4 h-4" />
-                Compare
-              </button>
+              <>
+                <button
+                  onClick={() => setShowComparison(true)}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  <Layers className="w-4 h-4" />
+                  Compare
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </>
             )}
           </div>
 

@@ -68,7 +68,7 @@ function App() {
               <Timeline />
             </div>
 
-            <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-4">
+            <div className="w-full lg:w-[480px] lg:flex-shrink-0 space-y-4">
               <ScrollArea className="h-[calc(100vh-8rem)]">
                 <div className="space-y-4 pr-4">
                   {mode === ExecutionMode.AI ? (
@@ -92,7 +92,7 @@ function App() {
       </div>
 
       <Dialog open={ui.showComparison} onOpenChange={setShowComparison}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layers className="w-5 h-5" />
