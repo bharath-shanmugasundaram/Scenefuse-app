@@ -117,11 +117,11 @@ export function Timeline({ className }: TimelineProps) {
     return (
       <div
         className={cn(
-          'h-32 bg-gray-100 rounded-lg flex items-center justify-center',
+          'h-32 bg-blue-50 rounded-lg flex items-center justify-center',
           className
         )}
       >
-        <p className="text-gray-400 text-sm">Upload a video to see timeline</p>
+        <p className="text-blue-400 text-sm">Upload a video to see timeline</p>
       </div>
     );
   }
@@ -146,12 +146,12 @@ export function Timeline({ className }: TimelineProps) {
             <Plus className="w-3 h-3 mr-1" />
             Mark Frame
           </Button>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-blue-900/50">
             {frameSelections.length} frames selected
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-blue-900/50">
             Drag to create segments
           </span>
         </div>
@@ -159,22 +159,22 @@ export function Timeline({ className }: TimelineProps) {
 
       <div
         ref={timelineRef}
-        className="relative h-24 bg-gray-100 rounded-lg overflow-hidden cursor-crosshair select-none"
+        className="relative h-24 bg-blue-50 rounded-lg overflow-hidden cursor-crosshair select-none"
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className="absolute top-0 left-0 right-0 h-6 border-b border-gray-200">
+        <div className="absolute top-0 left-0 right-0 h-6 border-b border-blue-100">
           {timeMarkers.map((time) => (
             <div
               key={time}
               className="absolute top-0 h-full flex flex-col items-center"
               style={{ left: `${(time / duration) * 100}%` }}
             >
-              <div className="w-px h-2 bg-gray-400" />
-              <span className="text-[10px] text-gray-500 mt-0.5">
+              <div className="w-px h-2 bg-blue-300" />
+              <span className="text-[10px] text-blue-900/50 mt-0.5">
                 {formatDuration(time)}
               </span>
             </div>
@@ -185,7 +185,7 @@ export function Timeline({ className }: TimelineProps) {
           {waveformHeights.map((h, i) => (
             <div
               key={i}
-              className="flex-1 mx-px bg-gray-300 rounded-sm"
+              className="flex-1 mx-px bg-blue-200 rounded-sm"
               style={{
                 height: `${h}%`,
               }}
@@ -238,10 +238,10 @@ export function Timeline({ className }: TimelineProps) {
 
         {hoverTime !== null && !isDragging && (
           <div
-            className="absolute top-0 bottom-0 w-px bg-gray-400/50 pointer-events-none"
+            className="absolute top-0 bottom-0 w-px bg-blue-300/50 pointer-events-none"
             style={{ left: `${(hoverTime / duration) * 100}%` }}
           >
-            <div className="absolute -top-1 -translate-x-1/2 text-[10px] text-gray-500 bg-white px-1 rounded">
+            <div className="absolute -top-1 -translate-x-1/2 text-[10px] text-blue-900/50 bg-white px-1 rounded">
               {formatDuration(hoverTime)}
             </div>
           </div>
@@ -260,24 +260,24 @@ export function Timeline({ className }: TimelineProps) {
 
       {timelineSegments.length > 0 && (
         <div className="space-y-1">
-          <p className="text-xs font-medium text-gray-700">Segments</p>
+          <p className="text-xs font-medium text-blue-900">Segments</p>
           <div className="flex flex-wrap gap-2">
             {timelineSegments.map((segment) => (
               <div
                 key={segment.id}
-                className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs"
+                className="flex items-center gap-1 px-2 py-1 bg-blue-50 rounded text-xs"
               >
                 <div
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: segment.color }}
                 />
                 <span>{segment.label}</span>
-                <span className="text-gray-500">
+                <span className="text-blue-900/50">
                   ({formatDuration(segment.startTime)} - {formatDuration(segment.endTime)})
                 </span>
                 <button
                   onClick={() => removeTimelineSegment(segment.id)}
-                  className="ml-1 text-gray-400 hover:text-red-500"
+                  className="ml-1 text-blue-400 hover:text-red-500"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>

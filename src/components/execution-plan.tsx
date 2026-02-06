@@ -39,11 +39,11 @@ interface ExecutionPlanProps {
 }
 
 const statusIcons: Record<StepStatus, React.ReactNode> = {
-  [StepStatus.PENDING]: <div className="w-5 h-5 rounded-full border-2 border-gray-300" />,
+  [StepStatus.PENDING]: <div className="w-5 h-5 rounded-full border-2 border-blue-200" />,
   [StepStatus.RUNNING]: <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />,
   [StepStatus.COMPLETED]: <CheckCircle2 className="w-5 h-5 text-green-500" />,
   [StepStatus.FAILED]: <AlertCircle className="w-5 h-5 text-red-500" />,
-  [StepStatus.SKIPPED]: <SkipForward className="w-5 h-5 text-gray-400" />,
+  [StepStatus.SKIPPED]: <SkipForward className="w-5 h-5 text-blue-400" />,
   [StepStatus.ROLLBACK]: <RotateCcw className="w-5 h-5 text-yellow-500" />,
 };
 
@@ -65,9 +65,9 @@ export function ExecutionPlanView({ className }: ExecutionPlanProps) {
 
   if (!plan) {
     return (
-      <div className={cn('p-6 bg-gray-50 rounded-lg text-center', className)}>
-        <Sparkles className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-500">
+      <div className={cn('p-6 bg-blue-50 rounded-lg text-center', className)}>
+        <Sparkles className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+        <p className="text-blue-900/50">
           {mode === 'ai'
             ? 'Enter a prompt to generate an execution plan'
             : 'Add steps to your manual pipeline'}
@@ -123,16 +123,16 @@ export function ExecutionPlanView({ className }: ExecutionPlanProps) {
                   Execution Plan
                 </CardTitle>
                 {plan.prompt && (
-                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                  <p className="text-sm text-blue-900/50 mt-1 line-clamp-2">
                     &ldquo;{plan.prompt}&rdquo;
                   </p>
                 )}
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-blue-900">
                   {formatEstimatedTime(plan.totalEstimatedTime)}
                 </p>
-                <p className="text-xs text-gray-500">Estimated time</p>
+                <p className="text-xs text-blue-900/50">Estimated time</p>
               </div>
             </div>
             <div>
@@ -161,16 +161,16 @@ export function ExecutionPlanView({ className }: ExecutionPlanProps) {
           {plan.status === JobStatus.EXECUTING && (
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-gray-600">
+                <span className="text-blue-900/60">
                   {runningStep
                     ? `Running: ${runningStep.modelName}`
                     : 'Processing...'}
                 </span>
-                <span className="text-gray-500">
+                <span className="text-blue-900/50">
                   {plan.steps.filter((s) => s.status === StepStatus.COMPLETED).length} / {plan.steps.length}
                 </span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-blue-50 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-blue-500"
                   initial={{ width: 0 }}
@@ -290,12 +290,12 @@ function StepCard({
       >
         <div className="flex items-center gap-3">
           {canReorder && (
-            <div className="cursor-grab active:cursor-grabbing text-gray-400">
+            <div className="cursor-grab active:cursor-grabbing text-blue-400">
               <GripVertical className="w-4 h-4" />
             </div>
           )}
 
-          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-xs font-medium text-blue-900/60 flex-shrink-0">
             {index + 1}
           </div>
 
@@ -303,7 +303,7 @@ function StepCard({
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-blue-900">
                 {step.modelName}
               </span>
               {step.isOptional && (
@@ -319,20 +319,20 @@ function StepCard({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-sm text-gray-500 flex-shrink-0">
+          <div className="flex items-center gap-1 text-sm text-blue-900/50 flex-shrink-0">
             <Clock className="w-4 h-4" />
             {formatEstimatedTime(step.estimatedTime)}
           </div>
 
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <ChevronUp className="w-4 h-4 text-blue-400 flex-shrink-0" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <ChevronDown className="w-4 h-4 text-blue-400 flex-shrink-0" />
           )}
         </div>
 
         <div className="flex items-center justify-between pl-9">
-          <p className="text-sm text-gray-500 line-clamp-2 flex-1 mr-3">{step.explanation}</p>
+          <p className="text-sm text-blue-900/50 line-clamp-2 flex-1 mr-3">{step.explanation}</p>
           <div className="flex items-center gap-1 flex-shrink-0">
             {isPending && (
               <Button
@@ -386,25 +386,25 @@ function StepCard({
       </div>
 
       {isExpanded && (
-        <div className="px-3 pb-3 border-t bg-gray-50/50">
+        <div className="px-3 pb-3 border-t bg-blue-50/50">
           <div className="pt-3 space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
+              <p className="text-sm font-medium text-blue-900 mb-1">
                 Why this step?
               </p>
-              <p className="text-sm text-gray-600">{step.explanation}</p>
+              <p className="text-sm text-blue-900/60">{step.explanation}</p>
             </div>
 
             {model && model.parameters.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                <p className="text-sm font-medium text-blue-900 mb-2 flex items-center gap-1">
                   <Settings className="w-3 h-3" />
                   Parameters
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {model.parameters.map((param) => (
                     <div key={param.id} className="space-y-1">
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-blue-900/50">
                         {param.name}
                       </label>
                       <ParameterInput
@@ -425,10 +425,10 @@ function StepCard({
 
             {step.dependencies.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
+                <p className="text-sm font-medium text-blue-900 mb-1">
                   Dependencies
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-blue-900/60">
                   Waits for steps: {step.dependencies.join(', ')}
                 </p>
               </div>
@@ -436,10 +436,10 @@ function StepCard({
 
             {step.result && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
+                <p className="text-sm font-medium text-blue-900 mb-1">
                   Result
                 </p>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-blue-900/60 space-y-1">
                   <p>Status: {step.result.success ? 'Success' : 'Failed'}</p>
                   {step.result.processingTime && (
                     <p>Processing time: {step.result.processingTime}s</p>
@@ -520,7 +520,7 @@ function ParameterInput({
             disabled={disabled}
             className="flex-1"
           />
-          <span className="text-xs text-gray-500 w-10 text-right">
+          <span className="text-xs text-blue-900/50 w-10 text-right">
             {currentValue as number}
           </span>
         </div>

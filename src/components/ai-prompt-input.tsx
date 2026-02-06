@@ -61,9 +61,9 @@ export function AIPromptInput({ onPlanGenerated }: AIPromptInputProps) {
 
   if (!video) {
     return (
-      <div className="p-6 bg-gray-50 rounded-lg text-center">
-        <Sparkles className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-500">Upload a video to use AI mode</p>
+      <div className="p-6 bg-blue-50 rounded-lg text-center">
+        <Sparkles className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+        <p className="text-blue-900/50">Upload a video to use AI mode</p>
       </div>
     );
   }
@@ -73,9 +73,9 @@ export function AIPromptInput({ onPlanGenerated }: AIPromptInputProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-blue-600" />
-          <h3 className="font-medium text-gray-900">AI Assistant</h3>
+          <h3 className="font-medium text-blue-900">AI Assistant</h3>
         </div>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-blue-900/50">
           Describe what you want to edit
         </span>
       </div>
@@ -106,13 +106,13 @@ export function AIPromptInput({ onPlanGenerated }: AIPromptInputProps) {
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 text-right">
+      <p className="text-xs text-blue-400 text-right">
         Press Cmd+Enter to generate
       </p>
 
       {showExamples && (
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-blue-900/60">
             <Lightbulb className="w-4 h-4" />
             <span>Try these examples:</span>
           </div>
@@ -121,7 +121,7 @@ export function AIPromptInput({ onPlanGenerated }: AIPromptInputProps) {
               <button
                 key={example}
                 onClick={() => handleExampleClick(example)}
-                className="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-left"
+                className="px-3 py-1.5 text-sm text-blue-900/60 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors text-left"
               >
                 {example}
               </button>

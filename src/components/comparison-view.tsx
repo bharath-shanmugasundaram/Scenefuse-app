@@ -26,9 +26,9 @@ export function ComparisonView({ className }: ComparisonViewProps) {
 
   if (!video) {
     return (
-      <div className={cn('p-6 bg-gray-50 rounded-lg text-center', className)}>
-        <Layers className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-500">Upload and process a video to compare</p>
+      <div className={cn('p-6 bg-blue-50 rounded-lg text-center', className)}>
+        <Layers className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+        <p className="text-blue-900/50">Upload and process a video to compare</p>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export function ComparisonView({ className }: ComparisonViewProps) {
 
       {ui.comparisonMode === 'split' && (
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">Split position:</span>
+          <span className="text-sm text-blue-900/50">Split position:</span>
           <Slider
             value={[splitPosition]}
             max={100}
@@ -140,13 +140,13 @@ export function ComparisonView({ className }: ComparisonViewProps) {
             onValueChange={(v) => setSplitPosition(v[0])}
             className="flex-1"
           />
-          <span className="text-sm text-gray-500 w-12">{splitPosition}%</span>
+          <span className="text-sm text-blue-900/50 w-12">{splitPosition}%</span>
         </div>
       )}
 
       {ui.comparisonMode === 'overlay' && (
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">Overlay opacity:</span>
+          <span className="text-sm text-blue-900/50">Overlay opacity:</span>
           <Slider
             value={[overlayOpacity]}
             max={100}
@@ -154,13 +154,13 @@ export function ComparisonView({ className }: ComparisonViewProps) {
             onValueChange={(v) => setOverlayOpacity(v[0])}
             className="flex-1"
           />
-          <span className="text-sm text-gray-500 w-12">{overlayOpacity}%</span>
+          <span className="text-sm text-blue-900/50 w-12">{overlayOpacity}%</span>
         </div>
       )}
 
       <div className="flex justify-between text-sm">
-        <span className="text-gray-500">Before (Original)</span>
-        <span className="text-gray-500">After (Processed)</span>
+        <span className="text-blue-900/50">Before (Original)</span>
+        <span className="text-blue-900/50">After (Processed)</span>
       </div>
     </div>
   );
@@ -283,8 +283,8 @@ function SplitView({
       >
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
           <div className="flex gap-0.5">
-            <div className="w-0.5 h-4 bg-gray-400" />
-            <div className="w-0.5 h-4 bg-gray-400" />
+            <div className="w-0.5 h-4 bg-blue-300" />
+            <div className="w-0.5 h-4 bg-blue-300" />
           </div>
         </div>
       </div>
@@ -370,7 +370,7 @@ function SideBySideView({ beforeUrl, afterUrl, isPlaying }: SideBySideViewProps)
         </div>
       </div>
 
-      <div className="w-px bg-gray-300" />
+      <div className="w-px bg-blue-200" />
 
       <div className="flex-1 relative min-w-0">
         <video

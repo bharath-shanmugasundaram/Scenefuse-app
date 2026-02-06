@@ -12,14 +12,14 @@ export function ModeToggle({ className }: ModeToggleProps) {
 
   const handleModeChange = (newMode: ExecutionMode) => {
     if (newMode === mode) return;
-    
+
     if (newMode === ExecutionMode.MANUAL && plan && plan.steps.length > 0) {
       const confirmed = window.confirm(
         'Switching to Manual mode will clear your AI-generated plan. Continue?'
       );
       if (!confirmed) return;
     }
-    
+
     if (newMode === ExecutionMode.AI && manualSteps.length > 0) {
       const confirmed = window.confirm(
         'Switching to AI mode will clear your manual pipeline. Continue?'
@@ -33,7 +33,7 @@ export function ModeToggle({ className }: ModeToggleProps) {
   return (
     <div
       className={cn(
-        'inline-flex items-center p-1 bg-gray-100 rounded-lg',
+        'inline-flex items-center p-1 bg-blue-50 rounded-lg border border-blue-100',
         className
       )}
     >
@@ -42,8 +42,8 @@ export function ModeToggle({ className }: ModeToggleProps) {
         className={cn(
           'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
           mode === ExecutionMode.MANUAL
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white text-[#056cb8] shadow-sm'
+            : 'text-blue-400 hover:text-[#056cb8]'
         )}
       >
         <SlidersHorizontal className="w-4 h-4" />
@@ -54,8 +54,8 @@ export function ModeToggle({ className }: ModeToggleProps) {
         className={cn(
           'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
           mode === ExecutionMode.AI
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white text-[#056cb8] shadow-sm'
+            : 'text-blue-400 hover:text-[#056cb8]'
         )}
       >
         <Sparkles className="w-4 h-4" />

@@ -72,9 +72,9 @@ export function ManualPipeline({ className }: ManualPipelineProps) {
 
   if (!video) {
     return (
-      <div className={cn('p-6 bg-gray-50 rounded-lg text-center', className)}>
-        <Settings className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-500">Upload a video to build your pipeline</p>
+      <div className={cn('p-6 bg-blue-50 rounded-lg text-center', className)}>
+        <Settings className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+        <p className="text-blue-900/50">Upload a video to build your pipeline</p>
       </div>
     );
   }
@@ -138,20 +138,20 @@ export function ManualPipeline({ className }: ManualPipelineProps) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Settings className="w-5 h-5 text-gray-600" />
+                <Settings className="w-5 h-5 text-blue-900/60" />
                 Manual Pipeline
               </CardTitle>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-blue-900/50 mt-1">
                 Build your own editing workflow step by step
               </p>
             </div>
             <div className="flex items-center gap-3">
               {manualSteps.length > 0 && (
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-blue-900">
                     {formatEstimatedTime(totalEstimatedTime)}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-blue-900/50">
                     {manualSteps.length} steps
                   </p>
                 </div>
@@ -178,10 +178,10 @@ export function ManualPipeline({ className }: ManualPipelineProps) {
         </CardHeader>
         <CardContent>
           {manualSteps.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-              <Settings className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 mb-2">Your pipeline is empty</p>
-              <p className="text-sm text-gray-400">
+            <div className="text-center py-12 bg-blue-50 rounded-lg border-2 border-dashed">
+              <Settings className="w-12 h-12 text-blue-300 mx-auto mb-3" />
+              <p className="text-blue-900/50 mb-2">Your pipeline is empty</p>
+              <p className="text-sm text-blue-400">
                 Click &ldquo;Add Step&rdquo; to start building your workflow
               </p>
             </div>
@@ -267,7 +267,7 @@ function ModelSelector({ onSelect }: ModelSelectorProps) {
     <div className="space-y-6">
       {Object.entries(modelsByCategory).map(([category, models]) => (
         <div key={category}>
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
+          <h4 className="text-sm font-medium text-blue-900 mb-3">
             {categories[category as keyof typeof categories]}
           </h4>
           <div className="grid grid-cols-1 gap-2">
@@ -277,19 +277,19 @@ function ModelSelector({ onSelect }: ModelSelectorProps) {
                 onClick={() => onSelect(model.id)}
                 className="flex items-start gap-3 p-3 text-left border rounded-lg hover:border-blue-500 hover:bg-blue-50/50 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
                   {modelIcons[model.id]}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-blue-900">
                       {model.name}
                     </span>
                     <Badge variant="outline" className="text-xs">
                       ~{formatEstimatedTime(model.estimatedTime)}
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="text-sm text-blue-900/50 mt-0.5">
                     {model.description}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
@@ -305,7 +305,7 @@ function ModelSelector({ onSelect }: ModelSelectorProps) {
                     )}
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                <ArrowRight className="w-5 h-5 text-blue-400 flex-shrink-0" />
               </button>
             ))}
           </div>
@@ -346,21 +346,21 @@ function ManualStepCard({
       <Accordion type="single" collapsible>
         <AccordionItem value={step.id} className="border-0">
           <div className="flex items-center gap-3 p-3">
-            <div className="cursor-grab active:cursor-grabbing text-gray-400">
+            <div className="cursor-grab active:cursor-grabbing text-blue-400">
               <GripVertical className="w-4 h-4" />
             </div>
 
-            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600">
+            <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-xs font-medium text-blue-900/60">
               {index + 1}
             </div>
 
-            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
               {modelIcons[step.modelType]}
             </div>
 
             <div className="flex-1 min-w-0">
-              <span className="font-medium text-gray-900">{step.modelName}</span>
-              <p className="text-sm text-gray-500 truncate">
+              <span className="font-medium text-blue-900">{step.modelName}</span>
+              <p className="text-sm text-blue-900/50 truncate">
                 {formatEstimatedTime(step.estimatedTime)}
               </p>
             </div>
@@ -399,13 +399,13 @@ function ManualStepCard({
             <div className="pt-3 border-t space-y-4">
               {model && model.parameters.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">
+                  <p className="text-sm font-medium text-blue-900 mb-2">
                     Parameters
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     {model.parameters.map((param) => (
                       <div key={param.id} className="space-y-1">
-                        <label className="text-xs text-gray-500">
+                        <label className="text-xs text-blue-900/50">
                           {param.name}
                         </label>
                         <ParameterInput
@@ -425,7 +425,7 @@ function ManualStepCard({
               )}
 
               <div>
-                <label className="text-xs text-gray-500 block mb-1">
+                <label className="text-xs text-blue-900/50 block mb-1">
                   Notes
                 </label>
                 <input
@@ -510,7 +510,7 @@ function ParameterInput({
             disabled={disabled}
             className="flex-1"
           />
-          <span className="text-xs text-gray-500 w-10 text-right">
+          <span className="text-xs text-blue-900/50 w-10 text-right">
             {currentValue as number}
           </span>
         </div>
