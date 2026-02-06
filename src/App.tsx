@@ -92,7 +92,7 @@ function App() {
       </div>
 
       <Dialog open={ui.showComparison} onOpenChange={setShowComparison}>
-        <DialogContent className="max-w-[95vw] w-full max-h-[95vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] w-full max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layers className="w-5 h-5" />
