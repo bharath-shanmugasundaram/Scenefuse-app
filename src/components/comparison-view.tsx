@@ -89,17 +89,6 @@ export function ComparisonView({ className }: ComparisonViewProps) {
             )}
             {isPlaying ? 'Pause' : 'Play'}
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="w-4 h-4" />
-            Export
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowComparison(false)}
-          >
-            Close
-          </Button>
         </div>
       </div>
 
