@@ -23,7 +23,7 @@ function App() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-screen-2xl mx-auto space-y-6">
         {!video && (
           <div className="space-y-8">
             <div className="text-center space-y-4 py-12">
@@ -59,8 +59,8 @@ function App() {
         )}
 
         {video && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-4">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 min-w-0 space-y-4">
               <div className="bg-black rounded-lg overflow-hidden">
                 <VideoPlayer url={video.url} className="aspect-video" />
               </div>
@@ -68,8 +68,8 @@ function App() {
               <Timeline />
             </div>
 
-            <div className="space-y-4">
-              <ScrollArea className="h-[calc(100vh-12rem)]">
+            <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-4">
+              <ScrollArea className="h-[calc(100vh-8rem)]">
                 <div className="space-y-4 pr-4">
                   {mode === ExecutionMode.AI ? (
                     <>
