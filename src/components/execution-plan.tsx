@@ -115,39 +115,41 @@ export function ExecutionPlanView({ className }: ExecutionPlanProps) {
     <div className={cn('space-y-4', className)}>
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                Execution Plan
-              </CardTitle>
-              {plan.prompt && (
-                <p className="text-sm text-gray-500 mt-1">
-                  &ldquo;{plan.prompt}&rdquo;
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  Execution Plan
+                </CardTitle>
+                {plan.prompt && (
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                    &ldquo;{plan.prompt}&rdquo;
+                  </p>
+                )}
+              </div>
+              <div className="text-right flex-shrink-0">
                 <p className="text-sm font-medium text-gray-900">
                   {formatEstimatedTime(plan.totalEstimatedTime)}
                 </p>
                 <p className="text-xs text-gray-500">Estimated time</p>
               </div>
+            </div>
+            <div>
               {plan.status === JobStatus.PENDING_APPROVAL && (
-                <Button onClick={approvePlan} className="gap-2">
+                <Button onClick={approvePlan} className="gap-2 w-full">
                   <Play className="w-4 h-4" />
                   Approve & Run
                 </Button>
               )}
               {plan.status === JobStatus.EXECUTING && (
-                <Button disabled className="gap-2">
+                <Button disabled className="gap-2 w-full">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Running...
                 </Button>
               )}
               {allCompleted && (
-                <Button variant="outline" className="gap-2 text-green-600">
+                <Button variant="outline" className="gap-2 w-full text-green-600">
                   <CheckCircle2 className="w-4 h-4" />
                   Completed
                 </Button>
@@ -283,98 +285,103 @@ function StepCard({
       )}
     >
       <div
-        className="flex items-center gap-3 p-3 cursor-pointer"
+        className="p-3 cursor-pointer space-y-2"
         onClick={onToggleExpand}
       >
-        {canReorder && (
-          <div className="cursor-grab active:cursor-grabbing text-gray-400">
-            <GripVertical className="w-4 h-4" />
+        <div className="flex items-center gap-3">
+          {canReorder && (
+            <div className="cursor-grab active:cursor-grabbing text-gray-400">
+              <GripVertical className="w-4 h-4" />
+            </div>
+          )}
+
+          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
+            {index + 1}
           </div>
-        )}
 
-        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600">
-          {index + 1}
-        </div>
+          <div className="flex-shrink-0">{statusIcons[step.status]}</div>
 
-        <div className="flex-shrink-0">{statusIcons[step.status]}</div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 truncate">
-              {step.modelName}
-            </span>
-            {step.isOptional && (
-              <Badge variant="outline" className="text-xs">
-                Optional
-              </Badge>
-            )}
-            {step.isRecommended && !isCompleted && (
-              <Badge variant="secondary" className="text-xs">
-                Recommended
-              </Badge>
-            )}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-gray-900">
+                {step.modelName}
+              </span>
+              {step.isOptional && (
+                <Badge variant="outline" className="text-xs">
+                  Optional
+                </Badge>
+              )}
+              {step.isRecommended && !isCompleted && (
+                <Badge variant="secondary" className="text-xs">
+                  Recommended
+                </Badge>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-gray-500 truncate">{step.explanation}</p>
-        </div>
 
-        <div className="flex items-center gap-1 text-sm text-gray-500">
-          <Clock className="w-4 h-4" />
-          {formatEstimatedTime(step.estimatedTime)}
-        </div>
+          <div className="flex items-center gap-1 text-sm text-gray-500 flex-shrink-0">
+            <Clock className="w-4 h-4" />
+            {formatEstimatedTime(step.estimatedTime)}
+          </div>
 
-        <div className="flex items-center gap-1">
-          {isPending && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onExecute();
-              }}
-            >
-              <Play className="w-4 h-4" />
-            </Button>
-          )}
-          {isCompleted && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRollback();
-              }}
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-          )}
-          {isPending && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSkip();
-              }}
-            >
-              <SkipForward className="w-4 h-4" />
-            </Button>
-          )}
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-red-500 hover:text-red-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
           )}
+        </div>
+
+        <div className="flex items-center justify-between pl-9">
+          <p className="text-sm text-gray-500 line-clamp-2 flex-1 mr-3">{step.explanation}</p>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {isPending && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onExecute();
+                }}
+              >
+                <Play className="w-4 h-4" />
+              </Button>
+            )}
+            {isCompleted && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRollback();
+                }}
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            )}
+            {isPending && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSkip();
+                }}
+              >
+                <SkipForward className="w-4 h-4" />
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-red-500 hover:text-red-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -394,7 +401,7 @@ function StepCard({
                   <Settings className="w-3 h-3" />
                   Parameters
                 </p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {model.parameters.map((param) => (
                     <div key={param.id} className="space-y-1">
                       <label className="text-xs text-gray-500">
