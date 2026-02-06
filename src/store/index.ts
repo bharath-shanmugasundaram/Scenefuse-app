@@ -305,6 +305,8 @@ export interface ModelParameter {
 // Store State Interface
 // ============================================
 
+type NavPage = 'editor' | 'history' | 'settings' | 'help';
+
 interface EditorState {
   currentJob: EditingJob | null;
   ui: UIState;
@@ -318,7 +320,9 @@ interface EditorState {
   timelineSegments: TimelineSegment[];
   plan: ExecutionPlan | null;
   manualSteps: ExecutionStep[];
+  activePage: NavPage;
 
+  setActivePage: (page: NavPage) => void;
   setMode: (mode: ExecutionMode) => void;
   setVideo: (video: VideoFile | null) => void;
   setCurrentTime: (time: number) => void;
@@ -397,6 +401,13 @@ export const useEditorStore = create<EditorState>()(
       timelineSegments: [],
       plan: null,
       manualSteps: [],
+      activePage: 'editor' as NavPage,
+
+      setActivePage: (page) => {
+        set((state) => {
+          state.activePage = page as NavPage;
+        });
+      },
 
       setMode: (mode) => {
         set((state) => {

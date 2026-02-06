@@ -94,7 +94,7 @@ export function VideoUpload({ onUploadComplete }: VideoUploadProps) {
         {...getRootProps()}
         className={cn(
           'relative border-2 border-dashed rounded-lg p-12 text-center transition-all duration-200 cursor-pointer',
-          'hover:border-gray-400 hover:bg-gray-50/50',
+          'hover:border-[#056cb8] hover:bg-blue-50/50',
           isDragActive && 'border-blue-500 bg-blue-50/50',
           isDragReject && 'border-red-500 bg-red-50/50',
           isUploading && 'pointer-events-none opacity-70'
@@ -109,9 +109,9 @@ export function VideoUpload({ onUploadComplete }: VideoUploadProps) {
                 <Film className="w-8 h-8 text-blue-600 animate-pulse" />
               </div>
               <div className="space-y-2 w-full max-w-xs">
-                <p className="text-sm font-medium text-gray-700">Uploading video...</p>
+                <p className="text-sm font-medium text-blue-900">Uploading video...</p>
                 <Progress value={uploadProgress} className="h-2" />
-                <p className="text-xs text-gray-500">{Math.round(uploadProgress)}%</p>
+                <p className="text-xs text-blue-900/50">{Math.round(uploadProgress)}%</p>
               </div>
             </>
           ) : (
@@ -119,28 +119,28 @@ export function VideoUpload({ onUploadComplete }: VideoUploadProps) {
               <div
                 className={cn(
                   'w-16 h-16 rounded-full flex items-center justify-center transition-colors',
-                  isDragActive ? 'bg-blue-100' : 'bg-gray-100'
+                  isDragActive ? 'bg-blue-100' : 'bg-blue-50'
                 )}
               >
                 {isDragActive ? (
                   <Check className="w-8 h-8 text-blue-600" />
                 ) : (
-                  <Upload className="w-8 h-8 text-gray-500" />
+                  <Upload className="w-8 h-8 text-[#056cb8]" />
                 )}
               </div>
 
               <div className="space-y-2">
-                <p className="text-lg font-medium text-gray-900">
+                <p className="text-lg font-medium text-[#056cb8]">
                   {isDragActive
                     ? 'Drop your video here'
                     : 'Drag & drop your video here'}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-blue-900/50">
                   or click to browse from your computer
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+              <div className="flex items-center gap-2 text-xs text-blue-400">
                 <FileVideo className="w-4 h-4" />
                 <span>MP4, MOV, AVI, WebM up to 500MB</span>
               </div>
@@ -159,17 +159,17 @@ export function VideoUpload({ onUploadComplete }: VideoUploadProps) {
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-semibold text-gray-900">8</p>
-          <p className="text-xs text-gray-500 mt-1">AI Models</p>
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <p className="text-2xl font-semibold text-[#056cb8]">8</p>
+          <p className="text-xs text-blue-900/50 mt-1">AI Models</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-semibold text-gray-900">4K</p>
-          <p className="text-xs text-gray-500 mt-1">Max Resolution</p>
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <p className="text-2xl font-semibold text-[#056cb8]">4K</p>
+          <p className="text-xs text-blue-900/50 mt-1">Max Resolution</p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-semibold text-gray-900">30s</p>
-          <p className="text-xs text-gray-500 mt-1">Avg. Processing</p>
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <p className="text-2xl font-semibold text-[#056cb8]">30s</p>
+          <p className="text-xs text-blue-900/50 mt-1">Avg. Processing</p>
         </div>
       </div>
     </div>
