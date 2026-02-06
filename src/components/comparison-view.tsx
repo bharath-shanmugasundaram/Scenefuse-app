@@ -368,7 +368,7 @@ function SideBySideView({ beforeUrl, afterUrl, isPlaying }: SideBySideViewProps)
 
   return (
     <div className="flex w-full h-full gap-2">
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-w-0">
         <video
           ref={beforeRef}
           src={beforeUrl}
@@ -384,7 +384,7 @@ function SideBySideView({ beforeUrl, afterUrl, isPlaying }: SideBySideViewProps)
 
       <div className="w-px bg-gray-300" />
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-w-0">
         <video
           ref={afterRef}
           src={afterUrl}
