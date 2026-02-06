@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -9,6 +9,7 @@ import {
   Play,
   Pause,
   Download,
+  AlertCircle,
 } from 'lucide-react';
 import { useEditorStore } from '@/store';
 
@@ -19,7 +20,7 @@ interface ComparisonViewProps {
 type ComparisonMode = 'split' | 'overlay' | 'side-by-side';
 
 export function ComparisonView({ className }: ComparisonViewProps) {
-  const { video, ui, setShowComparison, setComparisonMode } = useEditorStore();
+  const { video, processedVideoUrl, ui, setShowComparison, setComparisonMode } = useEditorStore();
   const [splitPosition, setSplitPosition] = useState(50);
   const [overlayOpacity, setOverlayOpacity] = useState(50);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -32,6 +33,10 @@ export function ComparisonView({ className }: ComparisonViewProps) {
       </div>
     );
   }
+
+  const beforeUrl = video.url;
+  const afterUrl = processedVideoUrl || video.url;
+  const hasProcessedVideo = !!processedVideoUrl;
 
   const handleModeChange = (mode: ComparisonMode) => {
     setComparisonMode(mode);
@@ -98,11 +103,21 @@ export function ComparisonView({ className }: ComparisonViewProps) {
         </div>
       </div>
 
+      {!hasProcessedVideo && (
+        <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <p className="text-sm text-amber-700">
+            No processed video yet. Run an execution plan to see before &amp; after comparison.
+            Showing original video on both sides for preview.
+          </p>
+        </div>
+      )}
+
       <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
         {ui.comparisonMode === 'split' && (
           <SplitView
-            beforeUrl={video.url}
-            afterUrl={video.url}
+            beforeUrl={beforeUrl}
+            afterUrl={afterUrl}
             splitPosition={splitPosition}
             onSplitChange={setSplitPosition}
             isPlaying={isPlaying}
@@ -111,8 +126,8 @@ export function ComparisonView({ className }: ComparisonViewProps) {
 
         {ui.comparisonMode === 'overlay' && (
           <OverlayView
-            beforeUrl={video.url}
-            afterUrl={video.url}
+            beforeUrl={beforeUrl}
+            afterUrl={afterUrl}
             opacity={overlayOpacity}
             isPlaying={isPlaying}
           />
@@ -120,8 +135,8 @@ export function ComparisonView({ className }: ComparisonViewProps) {
 
         {ui.comparisonMode === 'side-by-side' && (
           <SideBySideView
-            beforeUrl={video.url}
-            afterUrl={video.url}
+            beforeUrl={beforeUrl}
+            afterUrl={afterUrl}
             isPlaying={isPlaying}
           />
         )}
@@ -163,6 +178,47 @@ export function ComparisonView({ className }: ComparisonViewProps) {
   );
 }
 
+function useSyncedVideos(isPlaying: boolean) {
+  const beforeRef = useRef<HTMLVideoElement>(null);
+  const afterRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const before = beforeRef.current;
+    const after = afterRef.current;
+    if (!before || !after) return;
+
+    if (isPlaying) {
+      before.play().catch(() => {});
+      after.play().catch(() => {});
+    } else {
+      before.pause();
+      after.pause();
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    const before = beforeRef.current;
+    const after = afterRef.current;
+    if (!before || !after) return;
+
+    const syncAfterToBefore = () => {
+      if (Math.abs(before.currentTime - after.currentTime) > 0.1) {
+        after.currentTime = before.currentTime;
+      }
+    };
+
+    before.addEventListener('seeked', syncAfterToBefore);
+    before.addEventListener('timeupdate', syncAfterToBefore);
+
+    return () => {
+      before.removeEventListener('seeked', syncAfterToBefore);
+      before.removeEventListener('timeupdate', syncAfterToBefore);
+    };
+  }, []);
+
+  return { beforeRef, afterRef };
+}
+
 interface SplitViewProps {
   beforeUrl: string;
   afterUrl: string;
@@ -180,6 +236,7 @@ function SplitView({
 }: SplitViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { beforeRef, afterRef } = useSyncedVideos(isPlaying);
 
   const handleMouseDown = useCallback(() => {
     setIsDragging(true);
@@ -209,11 +266,12 @@ function SplitView({
       onMouseLeave={handleMouseUp}
     >
       <video
+        ref={afterRef}
         src={afterUrl}
         className="absolute inset-0 w-full h-full object-contain"
-        autoPlay={isPlaying}
         loop
         muted
+        playsInline
       />
 
       <div
@@ -221,11 +279,12 @@ function SplitView({
         style={{ clipPath: `inset(0 ${100 - splitPosition}% 0 0)` }}
       >
         <video
+          ref={beforeRef}
           src={beforeUrl}
           className="absolute inset-0 w-full h-full object-contain"
-          autoPlay={isPlaying}
           loop
           muted
+          playsInline
         />
       </div>
 
@@ -265,23 +324,27 @@ function OverlayView({
   opacity,
   isPlaying,
 }: OverlayViewProps) {
+  const { beforeRef, afterRef } = useSyncedVideos(isPlaying);
+
   return (
     <div className="relative w-full h-full">
       <video
+        ref={beforeRef}
         src={beforeUrl}
         className="absolute inset-0 w-full h-full object-contain"
-        autoPlay={isPlaying}
         loop
         muted
+        playsInline
       />
 
       <video
+        ref={afterRef}
         src={afterUrl}
         className="absolute inset-0 w-full h-full object-contain"
         style={{ opacity: opacity / 100 }}
-        autoPlay={isPlaying}
         loop
         muted
+        playsInline
       />
 
       <div className="absolute top-4 left-4 px-2 py-1 bg-black/70 text-white text-xs rounded">
@@ -301,15 +364,18 @@ interface SideBySideViewProps {
 }
 
 function SideBySideView({ beforeUrl, afterUrl, isPlaying }: SideBySideViewProps) {
+  const { beforeRef, afterRef } = useSyncedVideos(isPlaying);
+
   return (
     <div className="flex w-full h-full gap-2">
       <div className="flex-1 relative">
         <video
+          ref={beforeRef}
           src={beforeUrl}
           className="w-full h-full object-contain"
-          autoPlay={isPlaying}
           loop
           muted
+          playsInline
         />
         <div className="absolute top-4 left-4 px-2 py-1 bg-black/70 text-white text-xs rounded">
           Before
@@ -320,11 +386,12 @@ function SideBySideView({ beforeUrl, afterUrl, isPlaying }: SideBySideViewProps)
 
       <div className="flex-1 relative">
         <video
+          ref={afterRef}
           src={afterUrl}
           className="w-full h-full object-contain"
-          autoPlay={isPlaying}
           loop
           muted
+          playsInline
         />
         <div className="absolute top-4 right-4 px-2 py-1 bg-black/70 text-white text-xs rounded">
           After

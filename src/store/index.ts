@@ -310,6 +310,7 @@ interface EditorState {
   ui: UIState;
   mode: ExecutionMode;
   video: VideoFile | null;
+  processedVideoUrl: string | null;
   currentTime: number;
   duration: number;
   isPlaying: boolean;
@@ -349,6 +350,7 @@ interface EditorState {
   setComparisonMode: (mode: UIState['comparisonMode']) => void;
   setZoomLevel: (zoom: number) => void;
   setSelectedTool: (tool: AIModelType | null) => void;
+  setProcessedVideoUrl: (url: string | null) => void;
   createJob: (name: string, video: VideoFile) => void;
   resetJob: () => void;
 }
@@ -387,6 +389,7 @@ export const useEditorStore = create<EditorState>()(
       },
       mode: ExecutionMode.MANUAL,
       video: null,
+      processedVideoUrl: null,
       currentTime: 0,
       duration: 0,
       isPlaying: false,
@@ -628,12 +631,16 @@ export const useEditorStore = create<EditorState>()(
           if (step) {
             step.status = StepStatus.COMPLETED;
             step.actualTime = step.estimatedTime;
+            const outputUrl = state.video?.url || undefined;
             step.result = {
               success: true,
               processingTime: step.estimatedTime,
-              outputUrl: state.video?.url,
-              previewUrl: state.video?.url,
+              outputUrl,
+              previewUrl: outputUrl,
             };
+            if (outputUrl) {
+              state.processedVideoUrl = outputUrl;
+            }
           }
         });
       },
@@ -708,6 +715,12 @@ export const useEditorStore = create<EditorState>()(
         });
       },
 
+      setProcessedVideoUrl: (url) => {
+        set((state) => {
+          state.processedVideoUrl = url;
+        });
+      },
+
       createJob: (name, video) => {
         const job: EditingJob = {
           id: uuidv4(),
@@ -731,6 +744,7 @@ export const useEditorStore = create<EditorState>()(
         set((state) => {
           state.currentJob = null;
           state.video = null;
+          state.processedVideoUrl = null;
           state.plan = null;
           state.manualSteps = [];
           state.frameSelections = [];
