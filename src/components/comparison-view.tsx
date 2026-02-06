@@ -8,7 +8,6 @@ import {
   Columns,
   Play,
   Pause,
-  Download,
   AlertCircle,
 } from 'lucide-react';
 import { useEditorStore } from '@/store';
@@ -20,7 +19,7 @@ interface ComparisonViewProps {
 type ComparisonMode = 'split' | 'overlay' | 'side-by-side';
 
 export function ComparisonView({ className }: ComparisonViewProps) {
-  const { video, processedVideoUrl, ui, setShowComparison, setComparisonMode } = useEditorStore();
+  const { video, processedVideoUrl, ui, setComparisonMode } = useEditorStore();
   const [splitPosition, setSplitPosition] = useState(50);
   const [overlayOpacity, setOverlayOpacity] = useState(50);
   const [isPlaying, setIsPlaying] = useState(false);
