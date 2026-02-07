@@ -13,6 +13,10 @@ import type {
   VideoFile,
   EditingJob,
   UIState,
+  TouchPoint,
+  SegmentationResult,
+  ObjectRemovalPhase,
+  BrushStroke,
 } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -305,7 +309,7 @@ export interface ModelParameter {
 // Store State Interface
 // ============================================
 
-type NavPage = 'editor' | 'history' | 'settings' | 'help';
+type NavPage = 'editor' | 'history' | 'settings' | 'help' | 'object-removal';
 
 interface EditorState {
   currentJob: EditingJob | null;
@@ -357,6 +361,41 @@ interface EditorState {
   setProcessedVideoUrl: (url: string | null) => void;
   createJob: (name: string, video: VideoFile) => void;
   resetJob: () => void;
+
+  // Object Removal State
+  objectRemoval: {
+    phase: ObjectRemovalPhase;
+    frameImageUrl: string | null;
+    frameTimestamp: number;
+    touchPoints: TouchPoint[];
+    segments: SegmentationResult[];
+    combinedMaskUrl: string | null;
+    resultImageUrl: string | null;
+    isSegmenting: boolean;
+    isRemoving: boolean;
+    error: string | null;
+    brushMode: boolean;
+    brushSize: number;
+    brushStrokes: BrushStroke[];
+  };
+  enterObjectRemoval: () => void;
+  exitObjectRemoval: () => void;
+  setFrameImage: (url: string, timestamp: number) => void;
+  addTouchPoint: (point: TouchPoint) => void;
+  removeTouchPoint: (id: string) => void;
+  clearTouchPoints: () => void;
+  setSegments: (segments: SegmentationResult[]) => void;
+  setCombinedMask: (maskUrl: string | null) => void;
+  setObjectRemovalPhase: (phase: ObjectRemovalPhase) => void;
+  setIsSegmenting: (value: boolean) => void;
+  setIsRemoving: (value: boolean) => void;
+  setResultImage: (url: string | null) => void;
+  setObjectRemovalError: (error: string | null) => void;
+  setBrushMode: (enabled: boolean) => void;
+  setBrushSize: (size: number) => void;
+  addBrushStroke: (stroke: BrushStroke) => void;
+  clearBrushStrokes: () => void;
+  resetObjectRemoval: () => void;
 }
 
 interface FrameSelection {
@@ -764,6 +803,174 @@ export const useEditorStore = create<EditorState>()(
           state.duration = 0;
           state.isPlaying = false;
           state.ui.activePanel = 'upload';
+        });
+      },
+
+      // ============================================
+      // Object Removal State & Actions
+      // ============================================
+      objectRemoval: {
+        phase: 'select' as ObjectRemovalPhase,
+        frameImageUrl: null,
+        frameTimestamp: 0,
+        touchPoints: [],
+        segments: [],
+        combinedMaskUrl: null,
+        resultImageUrl: null,
+        isSegmenting: false,
+        isRemoving: false,
+        error: null,
+        brushMode: false,
+        brushSize: 30,
+        brushStrokes: [],
+      },
+
+      enterObjectRemoval: () => {
+        set((state) => {
+          state.activePage = 'object-removal' as NavPage;
+          state.isPlaying = false;
+          state.objectRemoval.phase = 'select';
+          state.objectRemoval.error = null;
+        });
+      },
+
+      exitObjectRemoval: () => {
+        set((state) => {
+          state.activePage = 'editor' as NavPage;
+          // Reset object removal state
+          state.objectRemoval.phase = 'select';
+          state.objectRemoval.frameImageUrl = null;
+          state.objectRemoval.touchPoints = [];
+          state.objectRemoval.segments = [];
+          state.objectRemoval.combinedMaskUrl = null;
+          state.objectRemoval.resultImageUrl = null;
+          state.objectRemoval.isSegmenting = false;
+          state.objectRemoval.isRemoving = false;
+          state.objectRemoval.error = null;
+          state.objectRemoval.brushStrokes = [];
+        });
+      },
+
+      setFrameImage: (url, timestamp) => {
+        set((state) => {
+          state.objectRemoval.frameImageUrl = url;
+          state.objectRemoval.frameTimestamp = timestamp;
+        });
+      },
+
+      addTouchPoint: (point) => {
+        set((state) => {
+          state.objectRemoval.touchPoints.push(point);
+          // Reset downstream state when new points added
+          state.objectRemoval.phase = 'select';
+          state.objectRemoval.segments = [];
+          state.objectRemoval.combinedMaskUrl = null;
+        });
+      },
+
+      removeTouchPoint: (id) => {
+        set((state) => {
+          state.objectRemoval.touchPoints = state.objectRemoval.touchPoints.filter(
+            (p: TouchPoint) => p.id !== id
+          );
+        });
+      },
+
+      clearTouchPoints: () => {
+        set((state) => {
+          state.objectRemoval.touchPoints = [];
+          state.objectRemoval.segments = [];
+          state.objectRemoval.combinedMaskUrl = null;
+          state.objectRemoval.phase = 'select';
+        });
+      },
+
+      setSegments: (segments) => {
+        set((state) => {
+          state.objectRemoval.segments = segments;
+        });
+      },
+
+      setCombinedMask: (maskUrl) => {
+        set((state) => {
+          state.objectRemoval.combinedMaskUrl = maskUrl;
+        });
+      },
+
+      setObjectRemovalPhase: (phase) => {
+        set((state) => {
+          state.objectRemoval.phase = phase;
+        });
+      },
+
+      setIsSegmenting: (value) => {
+        set((state) => {
+          state.objectRemoval.isSegmenting = value;
+        });
+      },
+
+      setIsRemoving: (value) => {
+        set((state) => {
+          state.objectRemoval.isRemoving = value;
+        });
+      },
+
+      setResultImage: (url) => {
+        set((state) => {
+          state.objectRemoval.resultImageUrl = url;
+        });
+      },
+
+      setObjectRemovalError: (error) => {
+        set((state) => {
+          state.objectRemoval.error = error;
+        });
+      },
+
+      setBrushMode: (enabled) => {
+        set((state) => {
+          state.objectRemoval.brushMode = enabled;
+        });
+      },
+
+      setBrushSize: (size) => {
+        set((state) => {
+          state.objectRemoval.brushSize = Math.max(5, Math.min(100, size));
+        });
+      },
+
+      addBrushStroke: (stroke) => {
+        set((state) => {
+          state.objectRemoval.brushStrokes.push(stroke);
+          state.objectRemoval.phase = 'select';
+          state.objectRemoval.segments = [];
+          state.objectRemoval.combinedMaskUrl = null;
+        });
+      },
+
+      clearBrushStrokes: () => {
+        set((state) => {
+          state.objectRemoval.brushStrokes = [];
+        });
+      },
+
+      resetObjectRemoval: () => {
+        set((state) => {
+          state.objectRemoval = {
+            phase: 'select',
+            frameImageUrl: null,
+            frameTimestamp: 0,
+            touchPoints: [],
+            segments: [],
+            combinedMaskUrl: null,
+            resultImageUrl: null,
+            isSegmenting: false,
+            isRemoving: false,
+            error: null,
+            brushMode: false,
+            brushSize: 30,
+            brushStrokes: [],
+          };
         });
       },
     })),

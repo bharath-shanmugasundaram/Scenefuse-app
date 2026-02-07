@@ -9,6 +9,7 @@ import { ComparisonView } from '@/components/comparison-view';
 import { SettingsPage } from '@/components/settings-page';
 import { HistoryPage } from '@/components/history-page';
 import { HelpPage } from '@/components/help-page';
+import { ObjectRemovalScreen } from '@/components/object-removal-screen';
 import { useEditorStore } from '@/store';
 import { ExecutionMode } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -19,10 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Wand2, Settings, Layers } from 'lucide-react';
+import { Wand2, Settings, Layers, Eraser } from 'lucide-react';
 
 function App() {
-  const { video, mode, ui, setShowComparison, activePage } = useEditorStore();
+  const { video, mode, ui, setShowComparison, activePage, enterObjectRemoval } = useEditorStore();
 
   return (
     <Layout>
@@ -65,8 +66,22 @@ function App() {
           {video && (
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1 min-w-0 space-y-4">
-                <div className="bg-black rounded-lg overflow-hidden">
+                <div className="bg-black rounded-lg overflow-hidden relative">
                   <VideoPlayer url={video.url} className="aspect-video" />
+                </div>
+
+                {/* Quick action: Object Removal */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={enterObjectRemoval}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-2 border-dashed border-red-300 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-400 transition-colors"
+                  >
+                    <Eraser className="w-4 h-4" />
+                    Touch to Remove Objects
+                  </button>
+                  <span className="text-xs text-blue-400">
+                    Pause the video, then tap objects to remove them
+                  </span>
                 </div>
 
                 <Timeline />
@@ -96,6 +111,7 @@ function App() {
         </div>
       )}
 
+      {activePage === 'object-removal' && <ObjectRemovalScreen />}
       {activePage === 'settings' && <SettingsPage />}
       {activePage === 'history' && <HistoryPage />}
       {activePage === 'help' && <HelpPage />}
