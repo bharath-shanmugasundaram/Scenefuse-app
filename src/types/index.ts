@@ -242,3 +242,48 @@ export interface StepUpdateRequest {
   stepId: string;
   updates: Partial<ExecutionStep>;
 }
+
+// ============================================
+// Object Removal Flow
+// ============================================
+
+export interface TouchPoint {
+  id: string;
+  x: number;
+  y: number;
+  label: 1 | 0; // 1 = foreground (include), 0 = background (exclude)
+}
+
+export interface SegmentationResult {
+  maskDataUrl: string; // base64 PNG mask from SAM
+  score: number;
+  boundingBox: { x: number; y: number; width: number; height: number };
+}
+
+export interface ObjectRemovalResult {
+  outputImageUrl: string;
+  processingTime: number;
+}
+
+export type ObjectRemovalPhase = 'select' | 'segmented' | 'processing' | 'done';
+
+export interface ObjectRemovalState {
+  phase: ObjectRemovalPhase;
+  frameImageUrl: string | null;
+  frameTimestamp: number;
+  touchPoints: TouchPoint[];
+  segments: SegmentationResult[];
+  combinedMaskUrl: string | null;
+  resultImageUrl: string | null;
+  isSegmenting: boolean;
+  isRemoving: boolean;
+  error: string | null;
+  brushMode: boolean;
+  brushSize: number;
+  brushStrokes: BrushStroke[];
+}
+
+export interface BrushStroke {
+  points: { x: number; y: number }[];
+  size: number;
+}

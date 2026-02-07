@@ -10,13 +10,14 @@ import {
   ChevronRight,
   Layers,
   Download,
+  Eraser,
 } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export type NavPage = 'editor' | 'history' | 'settings' | 'help';
+export type NavPage = 'editor' | 'history' | 'settings' | 'help' | 'object-removal';
 
 export function Layout({ children }: LayoutProps) {
   const { ui, setSidebarOpen, setShowComparison, video, processedVideoUrl, activePage, setActivePage } = useEditorStore();
@@ -64,6 +65,13 @@ export function Layout({ children }: LayoutProps) {
             isActive={activePage === 'editor'}
             collapsed={!ui.sidebarOpen}
             onClick={() => setActivePage('editor')}
+          />
+          <NavItem
+            icon={<Eraser className="w-5 h-5" />}
+            label="Object Removal"
+            isActive={activePage === 'object-removal'}
+            collapsed={!ui.sidebarOpen}
+            onClick={() => setActivePage('object-removal')}
           />
           <NavItem
             icon={<History className="w-5 h-5" />}
