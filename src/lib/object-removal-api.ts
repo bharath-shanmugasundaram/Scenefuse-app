@@ -173,6 +173,32 @@ class ObjectRemovalAPI {
   }
 
   /**
+   * Track masks through a video to generate a propagation preview.
+   * This mirrors the ProPainter "Tracking" step before inpainting.
+   */
+  async trackMasksInVideo(
+    videoFile: File,
+    maskUrl: string,
+    frameTimestamp: number,
+    options: {
+      startTime?: number;
+      endTime?: number;
+    } = {}
+  ): Promise<{ jobId: string; statusUrl: string }> {
+    const formData = new FormData();
+    formData.append('video', videoFile);
+    formData.append('mask_url', maskUrl);
+    formData.append('frame_timestamp', frameTimestamp.toString());
+    if (options.startTime !== undefined) formData.append('start_time', options.startTime.toString());
+    if (options.endTime !== undefined) formData.append('end_time', options.endTime.toString());
+
+    return this.request<{ jobId: string; statusUrl: string }>(
+      '/api/v1/track-video',
+      { method: 'POST', body: formData }
+    );
+  }
+
+  /**
    * Poll for video processing job status.
    */
   async getJobStatus(jobId: string): Promise<{
@@ -311,6 +337,17 @@ class MockObjectRemovalAPI {
   ): Promise<{ jobId: string; statusUrl: string }> {
     await this.delay(500);
     const jobId = `mock-job-${Date.now()}`;
+    return { jobId, statusUrl: `/api/v1/jobs/${jobId}` };
+  }
+
+  async trackMasksInVideo(
+    _videoFile: File,
+    _maskUrl: string,
+    _frameTimestamp: number,
+    _options: Record<string, unknown> = {}
+  ): Promise<{ jobId: string; statusUrl: string }> {
+    await this.delay(400);
+    const jobId = `mock-track-${Date.now()}`;
     return { jobId, statusUrl: `/api/v1/jobs/${jobId}` };
   }
 

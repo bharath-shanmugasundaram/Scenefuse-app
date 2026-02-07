@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useEditorStore } from '@/store';
 import { removalApi } from '@/lib/object-removal-api';
@@ -60,6 +61,12 @@ export function ObjectRemovalScreen() {
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [showBeforeAfter, setShowBeforeAfter] = useState(false);
+  const [isTracking, setIsTracking] = useState(false);
+  const [trackingProgress, setTrackingProgress] = useState(0);
+  const [trackingVideoUrl, setTrackingVideoUrl] = useState<string | null>(null);
+  const [isInpaintingVideo, setIsInpaintingVideo] = useState(false);
+  const [inpaintingProgress, setInpaintingProgress] = useState(0);
+  const [inpaintingVideoUrl, setInpaintingVideoUrl] = useState<string | null>(null);
 
   const {
     phase,
@@ -545,6 +552,85 @@ export function ObjectRemovalScreen() {
     setObjectRemovalPhase,
   ]);
 
+  const pollJobStatus = useCallback(async (jobId: string, onProgress: (value: number) => void) => {
+    let attempts = 0;
+    while (attempts < 120) {
+      const status = await removalApi.getJobStatus(jobId);
+      onProgress(status.progress);
+      if (status.status === 'completed') {
+        return status.outputUrl ?? null;
+      }
+      if (status.status === 'failed') {
+        throw new Error(status.error || 'Video processing failed.');
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      attempts += 1;
+    }
+    throw new Error('Video processing timed out.');
+  }, []);
+
+  const handleTrackMasks = useCallback(async () => {
+    if (!video?.file || !combinedMaskUrl) return;
+
+    setIsTracking(true);
+    setObjectRemovalError(null);
+    setTrackingProgress(0);
+
+    try {
+      const job = await removalApi.trackMasksInVideo(
+        video.file,
+        combinedMaskUrl,
+        objectRemoval.frameTimestamp,
+        { startTime: 0, endTime: video.duration }
+      );
+      const outputUrl = await pollJobStatus(job.jobId, setTrackingProgress);
+      setTrackingVideoUrl(outputUrl || video.url);
+    } catch (err) {
+      setObjectRemovalError(
+        err instanceof Error ? err.message : 'Tracking failed. Check backend connection.'
+      );
+    } finally {
+      setIsTracking(false);
+    }
+  }, [
+    video,
+    combinedMaskUrl,
+    objectRemoval.frameTimestamp,
+    pollJobStatus,
+    setObjectRemovalError,
+  ]);
+
+  const handleInpaintVideo = useCallback(async () => {
+    if (!video?.file || !combinedMaskUrl) return;
+
+    setIsInpaintingVideo(true);
+    setObjectRemovalError(null);
+    setInpaintingProgress(0);
+
+    try {
+      const job = await removalApi.removeObjectsFromVideo(
+        video.file,
+        combinedMaskUrl,
+        objectRemoval.frameTimestamp,
+        { startTime: 0, endTime: video.duration }
+      );
+      const outputUrl = await pollJobStatus(job.jobId, setInpaintingProgress);
+      setInpaintingVideoUrl(outputUrl || video.url);
+    } catch (err) {
+      setObjectRemovalError(
+        err instanceof Error ? err.message : 'Video inpainting failed. Check backend connection.'
+      );
+    } finally {
+      setIsInpaintingVideo(false);
+    }
+  }, [
+    video,
+    combinedMaskUrl,
+    objectRemoval.frameTimestamp,
+    pollJobStatus,
+    setObjectRemovalError,
+  ]);
+
   const handleUndo = useCallback(() => {
     if (brushStrokes.length > 0) {
       // Remove last brush stroke by clearing and re-adding all but last
@@ -561,7 +647,22 @@ export function ObjectRemovalScreen() {
     setCombinedMask(null);
     setResultImage(null);
     setObjectRemovalPhase('select');
-  }, [clearTouchPoints, clearBrushStrokes, setSegments, setCombinedMask, setResultImage, setObjectRemovalPhase]);
+    setTrackingVideoUrl(null);
+    setInpaintingVideoUrl(null);
+    setTrackingProgress(0);
+    setInpaintingProgress(0);
+  }, [
+    clearTouchPoints,
+    clearBrushStrokes,
+    setSegments,
+    setCombinedMask,
+    setResultImage,
+    setObjectRemovalPhase,
+    setTrackingVideoUrl,
+    setInpaintingVideoUrl,
+    setTrackingProgress,
+    setInpaintingProgress,
+  ]);
 
   const hasSelections = touchPoints.length > 0 || brushStrokes.length > 0;
 
@@ -588,13 +689,13 @@ export function ObjectRemovalScreen() {
 
           <div className="h-6 w-px bg-blue-200" />
 
-          <h2 className="text-sm font-semibold text-[#056cb8]">Object Removal</h2>
+          <h2 className="text-sm font-semibold text-[#056cb8]">Video Inpainting (ProPainter)</h2>
 
           <Badge variant="outline" className="text-xs">
-            {phase === 'select' && 'Select Objects'}
-            {phase === 'segmented' && 'Review Selection'}
+            {phase === 'select' && 'Select Frame'}
+            {phase === 'segmented' && 'Mask Ready'}
             {phase === 'processing' && 'Processing...'}
-            {phase === 'done' && 'Complete'}
+            {phase === 'done' && 'Frame Done'}
           </Badge>
         </div>
 
@@ -636,6 +737,31 @@ export function ObjectRemovalScreen() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left tool panel */}
         <div className="w-64 bg-slate-50 border-r border-blue-100 p-4 space-y-4 overflow-y-auto">
+          {/* Workflow status */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-blue-900 uppercase tracking-wider">
+              Workflow
+            </label>
+            <div className="space-y-2">
+              <WorkflowRow
+                label="1. Upload Video"
+                status={video ? 'done' : 'pending'}
+              />
+              <WorkflowRow
+                label="2. Select Frame & Mask"
+                status={combinedMaskUrl ? 'done' : frameImageUrl ? 'active' : 'pending'}
+              />
+              <WorkflowRow
+                label="3. Track Masks"
+                status={trackingVideoUrl ? 'done' : isTracking ? 'active' : 'pending'}
+              />
+              <WorkflowRow
+                label="4. Inpaint Video"
+                status={inpaintingVideoUrl ? 'done' : isInpaintingVideo ? 'active' : 'pending'}
+              />
+            </div>
+          </div>
+
           {/* Tool mode selector */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-blue-900 uppercase tracking-wider">
@@ -813,6 +939,43 @@ export function ObjectRemovalScreen() {
               </Button>
             )}
 
+            <Button
+              onClick={handleTrackMasks}
+              disabled={!combinedMaskUrl || !video?.file || isTracking}
+              variant="outline"
+              className="w-full"
+            >
+              {isTracking ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Tracking...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Track Masks (Preview)
+                </>
+              )}
+            </Button>
+
+            <Button
+              onClick={handleInpaintVideo}
+              disabled={!combinedMaskUrl || !video?.file || isInpaintingVideo || !trackingVideoUrl}
+              className="w-full bg-[#056cb8] hover:bg-[#045a9e]"
+            >
+              {isInpaintingVideo ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Inpainting Video...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Inpaint Video
+                </>
+              )}
+            </Button>
+
             {phase === 'done' && (
               <>
                 <Button
@@ -842,6 +1005,56 @@ export function ObjectRemovalScreen() {
               </>
             )}
           </div>
+
+          {(isTracking || isInpaintingVideo) && (
+            <div className="space-y-3 rounded-lg border border-blue-100 bg-white p-3">
+              <p className="text-xs font-medium text-blue-900">Processing Status</p>
+              {isTracking && (
+                <>
+                  <div className="flex justify-between text-xs text-blue-600">
+                    <span>Tracking masks</span>
+                    <span>{Math.round(trackingProgress)}%</span>
+                  </div>
+                  <Progress value={trackingProgress} className="h-2" />
+                </>
+              )}
+              {isInpaintingVideo && (
+                <>
+                  <div className="flex justify-between text-xs text-blue-600">
+                    <span>Inpainting video</span>
+                    <span>{Math.round(inpaintingProgress)}%</span>
+                  </div>
+                  <Progress value={inpaintingProgress} className="h-2" />
+                </>
+              )}
+            </div>
+          )}
+
+          {(trackingVideoUrl || inpaintingVideoUrl) && (
+            <div className="space-y-3 rounded-lg border border-blue-100 bg-white p-3">
+              <p className="text-xs font-medium text-blue-900">Outputs</p>
+              {trackingVideoUrl && (
+                <div className="space-y-1">
+                  <p className="text-[11px] text-blue-500">Tracking Preview</p>
+                  <video
+                    src={trackingVideoUrl}
+                    controls
+                    className="w-full rounded border border-blue-100"
+                  />
+                </div>
+              )}
+              {inpaintingVideoUrl && (
+                <div className="space-y-1">
+                  <p className="text-[11px] text-blue-500">Inpainted Result</p>
+                  <video
+                    src={inpaintingVideoUrl}
+                    controls
+                    className="w-full rounded border border-blue-100"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Phase progress */}
           <div className="space-y-1">
@@ -957,6 +1170,32 @@ function StepDot({ active, done }: { active: boolean; done: boolean }) {
     >
       {done && !active && <Check className="w-2.5 h-2.5 text-white" />}
       {active && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+    </div>
+  );
+}
+
+function WorkflowRow({
+  label,
+  status,
+}: {
+  label: string;
+  status: 'pending' | 'active' | 'done';
+}) {
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <span className={cn('text-blue-800', status === 'pending' && 'text-blue-300')}>
+        {label}
+      </span>
+      <span
+        className={cn(
+          'px-2 py-0.5 rounded-full text-[10px] font-medium',
+          status === 'done' && 'bg-green-100 text-green-700',
+          status === 'active' && 'bg-blue-100 text-blue-700',
+          status === 'pending' && 'bg-blue-50 text-blue-400'
+        )}
+      >
+        {status === 'done' ? 'Done' : status === 'active' ? 'In Progress' : 'Pending'}
+      </span>
     </div>
   );
 }
